@@ -1,0 +1,11 @@
+menuconfig LIBBENCHMARK
+	bool "Google Benchmark - A microbenchmark support library"
+	select LIBCXX
+	select LIBPTHREAD_EMBEDDED
+	select CXX_THREADS
+	select UKUNISTD
+	select UKSYSINFO
+	select LIBUKTIME
+	select LIBNEWLIBC
+	default n
+
