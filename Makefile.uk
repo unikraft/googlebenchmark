@@ -1,0 +1,111 @@
+#  SPDX-License-Identifier: BSD-3-Clause
+#
+#  benchmark Makefile.uk
+#
+#  Authors: Vlad-Andrei Badoiu <vlad_andrei.badoiu@stud.acs.upb.ro>
+#
+#  Copyright (c) 2019, University Politehnica of Bucharest. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+#  THIS HEADER MAY NOT BE EXTRACTED OR MODIFIED IN ANY WAY.
+#
+
+################################################################################
+# Library registration
+################################################################################
+$(eval $(call addlib_s,libbenchmark,$(CONFIG_LIBBENCHMARK)))
+
+################################################################################
+# Sources
+################################################################################
+LIBBENCHMARK_VERSION=1.5.0
+LIBBENCHMARK_URL=https://github.com/google/benchmark/archive/v$(LIBBENCHMARK_VERSION).tar.gz
+LIBBENCHMARK_PATCHDIR=$(LIBBENCHMARK_BASE)/patches
+$(eval $(call fetch,libbenchmark,$(LIBBENCHMARK_URL)))
+$(eval $(call patch,libbenchmark,$(LIBBENCHMARK_PATCHDIR),benchmark-$(LIBBENCHMARK_VERSION)))
+
+################################################################################
+# Helpers
+################################################################################
+LIBBENCHMARK_SUBDIR=benchmark-$(LIBBENCHMARK_VERSION)
+LIBBENCHMARK_SRC = $(LIBBENCHMARK_ORIGIN)/$(LIBBENCHMARK_SUBDIR)
+
+################################################################################
+# Library includes
+################################################################################
+LIBBENCHMARK_GLOBAL_INCLUDES-y += -I$(LIBBENCHMARK_SRC)/src
+LIBBENCHMARK_GLOBAL_INCLUDES-y += -I$(LIBBENCHMARK_SRC)/include
+CINCLUDES-y += $(LIBBENCHMARK_GLOBAL_INCLUDES-y)
+CXXINCLUDES-y += $(LIBBENCHMARK_GLOBAL_INCLUDES-y)
+
+################################################################################
+# Common flags
+################################################################################
+# Suppressed flags
+LIBBENCHMARK_SUPPRESS_FLAGS += -Wno-unused-parameter			\
+	-Wno-unused-variable -Wno-unused-value -Wno-unused-function 	\
+	-Wno-missing-field-initializers -Wno-implicit-fallthrough 	\
+	-Wno-cast-function-type -Wno-stringop-truncation 		\
+	-Wno-char-subscripts -Wno-sign-compare -Wno-parentheses		\
+	-Wno-deprecated-declarations
+
+LIBBENCHMARK_CFLAGS-y	+= $(LIBBENCHMARK_SUPPRESS_FLAGS) -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast
+LIBBENCHMARK_CXXFLAGS-y	+= $(LIBBENCHMARK_SUPPRESS_FLAGS)
+
+LIBBENCHMARK_CFLAGS-y	+=  -DBENCHMARK_OS_LINUX -DCLOCK_THREAD_CPUTIME_ID \
+				-DNDEBUG -DBENCHMARK_HAS_SYSCTL
+
+LIBBENCHMARK_CXXFLAGS-y	+=  -DBENCHMARK_OS_LINUX -DCLOCK_THREAD_CPUTIME_ID \
+				-DNDEBUG -DBENCHMARK_HAS_SYSCTL
+
+################################################################################
+# Glue code
+################################################################################
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_BASE)/glue.cc|unikraft
+
+################################################################################
+# Library sources
+################################################################################
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/complexity.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark_name.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/console_reporter.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/sleep.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark_runner.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark_api_internal.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/csv_reporter.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/statistics.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/json_reporter.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/reporter.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/commandlineflags.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark_register.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/sysinfo.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/string_util.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/counter.cc
+#LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/benchmark_main.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/timers.cc
+LIBBENCHMARK_SRCS-y += $(LIBBENCHMARK_SRC)/src/colorprint.cc
