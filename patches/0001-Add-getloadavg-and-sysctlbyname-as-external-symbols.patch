@@ -1,0 +1,28 @@
+From 0e5193cab3a0120197fe6b1f610e09a9de45fef2 Mon Sep 17 00:00:00 2001
+From: Vlad-Andrei Badoiu <vlad_andrei.badoiu@stud.acs.upb.ro>
+Date: Mon, 30 Sep 2019 01:28:41 +0300
+Subject: [PATCH 1/1] Add getloadavg and sysctlbyname as external symbols
+
+Signed-off-by: Vlad-Andrei Badoiu <vlad_andrei.badoiu@stud.acs.upb.ro>
+---
+ src/sysinfo.cc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/sysinfo.cc b/src/sysinfo.cc
+index 2812647..19938e8 100644
+--- a/src/sysinfo.cc
++++ b/src/sysinfo.cc
+@@ -65,6 +65,10 @@
+ #include "sleep.h"
+ #include "string_util.h"
+ 
++int getloadavg(double loadavg[], int nelem);
++int sysctlbyname(const char *name, void *oldp, size_t *oldlenp,
++	const void *newp, size_t newlen);
++
+ namespace benchmark {
+ namespace {
+ 
+-- 
+2.20.1
+
